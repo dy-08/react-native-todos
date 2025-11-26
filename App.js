@@ -24,12 +24,46 @@ export default function App() {
             setDate(changedDate);
         }
     };
-
+    const parseDay = (day) => {
+        switch (day) {
+            case 0:
+                return 'Sunday';
+            case 1:
+                return 'Monday';
+            case 2:
+                return 'Tuesday';
+            case 3:
+                return 'Wednesday';
+            case 4:
+                return 'Thursday';
+            case 5:
+                return 'Friday';
+            case 6:
+                return 'Saturday';
+        }
+    };
+    const parseMonth = (month) => {
+        const list = [
+            'January',
+            'February',
+            'March',
+            'April',
+            'May',
+            'June',
+            'July',
+            'August',
+            'September',
+            'October',
+            'November',
+            'December',
+        ];
+        return `${list[month]}`;
+    };
     const formatDate = (date) => {
-        const yy = date.getFullYear();
-        const mm = String(date.getMonth() + 1).padStart(2, '0');
-        const dd = String(date.getDate()).padStart(2, '0');
-        return `${yy}-${mm}-${dd}`;
+        const parsedMonth = parseMonth(date.getMonth());
+        const parsedDate = String(date.getDate()).padStart(2, '0');
+        const parsedDay = parseDay(date.getDay());
+        return `${parsedDay}-${parsedDate}-${parsedMonth}`;
     };
 
     const handleAdd = () => {
@@ -79,10 +113,30 @@ export default function App() {
                         <Text style={styles.maintxt}>Todo App</Text>
                         <Text style={styles.subtxt}>Check your todos</Text>
                     </View>
+                </View>
+
+                <LinearGradient
+                    colors={['#E9DCDB', '#DFDDDD30']} // 시작색, 끝색
+                    start={{ x: 0, y: 0 }} // 왼쪽 위
+                    end={{ x: 1, y: 0 }} // 오른쪽 위 (약 70deg 느낌)
+                    style={styles.gradientWrap}
+                >
                     <View style={styles.featuresBox}>
-                        <Pressable onPress={() => setTogglePicker((prev) => !prev)}>
-                            <Text>{formatDate(date)}</Text>
+                        <Pressable style={styles.dateTextWrap} onPress={() => setTogglePicker((prev) => !prev)}>
+                            <Text style={styles.dateText}>{formatDate(date)}</Text>
                         </Pressable>
+
+                        <View style={styles.dateWrap}>
+                            {togglePicker && (
+                                <DateTimePicker
+                                    value={date}
+                                    mode='date'
+                                    display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                                    onChange={handleDate}
+                                />
+                            )}
+                        </View>
+
                         <View style={styles.featurePhotos}>
                             <Pressable onPress={getPhoto}>
                                 <MaterialIcons name='add-a-photo' size={24} color='black' />
@@ -92,57 +146,43 @@ export default function App() {
                             </Pressable>
                         </View>
                     </View>
-                </View>
-                <View style={styles.dateWrap}>
-                    <LinearGradient
-                        colors={['#E9DCDB', '#DFDDDD30']} // 시작색, 끝색
-                        start={{ x: 0, y: 0 }} // 왼쪽 위
-                        end={{ x: 1, y: 0 }} // 오른쪽 위 (약 70deg 느낌)
-                        style={styles.dateWrap}
-                    >
-                        {togglePicker && (
-                            <DateTimePicker
-                                value={date}
-                                mode='date'
-                                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                                onChange={handleDate}
-                            />
-                        )}
-                    </LinearGradient>
-                </View>
+
+                    <View style={styles.inputWrap}>
+                        <TextInput style={styles.input} placeholder='todo' value={text} onChangeText={setText} />
+
+                        <Pressable onPress={handleAdd}>
+                            <Text style={styles.addButton}>추가</Text>
+                        </Pressable>
+                    </View>
+                </LinearGradient>
 
                 <View style={styles.imagePreviewBox}>
                     {photo && <Image style={styles.image} source={{ uri: photo }} />}
                 </View>
 
-                <View style={styles.inputWrap}>
-                    <TextInput style={styles.input} placeholder='todo' value={text} onChangeText={setText} />
-
-                    <Pressable onPress={handleAdd}>
-                        <Text style={styles.addButton}>추가</Text>
-                    </Pressable>
-                </View>
-                {/* ListEmptyComponent: 비어있을 때 */}
-                <FlatList
-                    tList
-                    data={todos}
-                    keyExtractor={(todo) => todo.id}
-                    ListEmptyComponent={<Text style={{ textAlign: 'center' }}>Empty</Text>}
-                    renderItem={({ item, index }) => (
-                        <Pressable style={styles.contents} onLongPress={() => handleDelete(item.id)}>
-                            <View style={styles.contentBox}>
-                                <View style={styles.smallImage}>
-                                    <Image style={styles.image} source={{ uri: item.image }} />
+                <View style={styles.contentBox}>
+                    {/* ListEmptyComponent: 비어있을 때 */}
+                    <FlatList
+                        tList
+                        data={todos}
+                        keyExtractor={(todo) => todo.id}
+                        ListEmptyComponent={<Text style={{ textAlign: 'center' }}>Empty</Text>}
+                        renderItem={({ item, index }) => (
+                            <Pressable style={styles.contents} onLongPress={() => handleDelete(item.id)}>
+                                <View style={styles.itemBox}>
+                                    <View style={styles.smallImage}>
+                                        <Image style={styles.image} source={{ uri: item.image }} />
+                                    </View>
+                                    <Text>{index + 1}</Text>
+                                    <Text>{item.title}</Text>
+                                    <Text>{item.date}</Text>
                                 </View>
-                                <Text>{index + 1}</Text>
-                                <Text>{item.title}</Text>
-                                <Text>{item.date}</Text>
-                            </View>
-                            {/* onLongPress시 삭제 */}
-                            <Text style={styles.deleteButton}>삭제</Text>
-                        </Pressable>
-                    )}
-                />
+                                {/* onLongPress시 삭제 */}
+                                <Text style={styles.deleteButton}>삭제</Text>
+                            </Pressable>
+                        )}
+                    />
+                </View>
             </View>
         </View>
     );
@@ -179,9 +219,13 @@ const styles = StyleSheet.create({
     },
     dateWrap: {
         width: '100%',
-        height: 'auto',
+        transform: 'scale(0.7)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        position: 'absolute',
+        top: -10,
+        left: 0,
         background: '#E9DCDB',
-        borderRadius: 8,
         background: 'linear-gradient(70deg, rgba(233, 220, 219, 1) 0%, rgba(223, 221, 221, 1) 100%)',
     },
     featuresBox: {
@@ -193,14 +237,74 @@ const styles = StyleSheet.create({
     featurePhotos: {
         flexDirection: 'row',
         gap: 10,
+        position: 'absolute',
+        left: 0,
+        top: 180,
     },
     image: {
         width: '100%',
         height: '100%',
+        overflow: 'hidden',
         objectFit: 'cover',
+        borderRadius: '50%',
     },
     imagePreviewBox: {
-        width: '96%',
-        aspectRatio: '3/2',
+        width: '100',
+        aspectRatio: '1/1',
+        borderRadius: 16,
+        justifyContent: 'center',
+    },
+    gradientWrap: {
+        width: '100%',
+        aspectRatio: 1 / 0.7,
+        borderRadius: 16,
+        padding: 24,
+        shadowColor: 'rgba(34, 60, 80, 0.6)',
+        shadowOffset: { width: 0, height: 5 },
+        shadowOpacity: 0.6,
+        shadowRadius: 5,
+    },
+    dateTextWrap: {
+        width: '100%',
+    },
+    dateText: {
+        fontSize: 17,
+        textAlign: 'left',
+        color: '#1f1f1f',
+        fontWeight: 'bold',
+    },
+    inputWrap: {
+        position: 'absolute',
+        right: 20,
+        bottom: 16,
+        flexDirection: 'row',
+        gap: 4,
+    },
+    input: {
+        width: 180,
+        height: 32,
+        borderWidth: 0.5,
+        paddingLeft: 10,
+        borderRadius: 4,
+    },
+    addButton: {
+        width: 46,
+        height: 32,
+        textAlign: 'center',
+        lineHeight: 32,
+        backgroundColor: 'green',
+        color: 'white',
+        borderRadius: 4,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    contentBox: {
+        width: '100%',
+        height: 'auto',
+    },
+    smallImage: {
+        width: 20,
+        height: 20,
+        borderRadius: '100%',
     },
 });
