@@ -1,4 +1,15 @@
-project
+1. Todo List
+React Native + Expo
+저장: @react-native-async-storage/async-storage
+날짜선택: @react-native-community/datetimepicker
+카메라/이미지: expo-image-picker
+스타일: React Native StyleSheet
+웹배포: Vercel + gitHub 연동
+
+mobile install
+Expo Go - testing program
+
+create project
 npx create-expo-app 폴더명 --template blank
 
 run
@@ -11,3 +22,27 @@ uuid
 npm install react-native-uuid
 import uuid from 'react-native-uuid';
 const myUniqueId = uuid.v4();
+
+date time picker install
+npx expo install @react-native-community/datetimepicker
+
+image picker install
+npx expo install expo-image-picker
+
+react-native-vector-icons
+https://oblador.github.io/react-native-vector-icons/#AntDesign
+
+react-native-vector-icons install
+npm install --save react-native-vector-icons
+
+web deploy (Vercel)
+npx expo install react-dom react-native-web
+>
+App.json Add "platforms"
+{
+  "expo": {
+        "platforms": ["ios", "android", ""],
+        },
+}
+
+git push
