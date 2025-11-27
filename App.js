@@ -116,66 +116,65 @@ export default function App() {
                 </View>
 
                 <LinearGradient
-                    colors={['#E9DCDB', '#DFDDDD30']} // 시작색, 끝색
+                    colors={['#8985F2', '#73D9B3']} // 시작색, 끝색
                     start={{ x: 0, y: 0 }} // 왼쪽 위
                     end={{ x: 1, y: 0 }} // 오른쪽 위 (약 70deg 느낌)
                     style={styles.gradientWrap}
                 >
-                    <View style={styles.featuresBox}>
-                        <Pressable style={styles.dateTextWrap} onPress={() => setTogglePicker((prev) => !prev)}>
-                            <Text style={styles.dateText}>{formatDate(date)}</Text>
-                        </Pressable>
+                    <Pressable style={styles.dateTextWrap} onPress={() => setTogglePicker((prev) => !prev)}>
+                        <Text style={styles.dateText}>{formatDate(date)}</Text>
+                    </Pressable>
 
-                        <View style={styles.dateWrap}>
-                            {togglePicker && (
-                                <DateTimePicker
-                                    value={date}
-                                    mode='date'
-                                    display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                                    onChange={handleDate}
-                                />
-                            )}
-                        </View>
-
-                        <View style={styles.featurePhotos}>
-                            <Pressable onPress={getPhoto}>
-                                <MaterialIcons name='add-a-photo' size={24} color='black' />
-                            </Pressable>
-                            <Pressable onPress={getGallery}>
-                                <FontAwesome name='photo' size={24} color='black' />
-                            </Pressable>
-                        </View>
+                    <View style={styles.dateWrap}>
+                        {togglePicker && (
+                            <DateTimePicker
+                                value={date}
+                                mode='date'
+                                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                                onChange={handleDate}
+                            />
+                        )}
                     </View>
 
-                    <View style={styles.inputWrap}>
-                        <TextInput style={styles.input} placeholder='todo' value={text} onChangeText={setText} />
-
-                        <Pressable onPress={handleAdd}>
-                            <Text style={styles.addButton}>추가</Text>
+                    <View style={styles.featurePhotos}>
+                        <Pressable onPress={getPhoto} style={styles.btnRound}>
+                            <MaterialIcons name='add-a-photo' size={20} color='black' />
                         </Pressable>
+                        <Pressable onPress={getGallery} style={styles.btnRound}>
+                            <FontAwesome name='photo' size={20} color='black' />
+                        </Pressable>
+                        <View style={styles.imagePreviewBox}>
+                            {photo && <Image style={styles.image} source={{ uri: photo }} />}
+                        </View>
                     </View>
                 </LinearGradient>
 
-                <View style={styles.imagePreviewBox}>
-                    {photo && <Image style={styles.image} source={{ uri: photo }} />}
+                <View style={styles.inputWrap}>
+                    <TextInput style={styles.input} placeholder='todo' value={text} onChangeText={setText} />
+                    <Pressable onPress={handleAdd} style={styles.btnAdd}>
+                        <Text style={styles.textAdd}>Add</Text>
+                    </Pressable>
                 </View>
 
                 <View style={styles.contentBox}>
                     {/* ListEmptyComponent: 비어있을 때 */}
                     <FlatList
-                        tList
+                        style={styles.contentboxList}
                         data={todos}
+                        horizontal
                         keyExtractor={(todo) => todo.id}
                         ListEmptyComponent={<Text style={{ textAlign: 'center' }}>Empty</Text>}
                         renderItem={({ item, index }) => (
                             <Pressable style={styles.contents} onLongPress={() => handleDelete(item.id)}>
                                 <View style={styles.itemBox}>
-                                    <View style={styles.smallImage}>
-                                        <Image style={styles.image} source={{ uri: item.image }} />
+                                    <View style={styles.itemPreviewImageWrap}>
+                                        <View style={styles.itemPreviewImageBox}>
+                                            <Image style={styles.image} source={{ uri: item.image }} />
+                                        </View>
                                     </View>
-                                    <Text>{index + 1}</Text>
-                                    <Text>{item.title}</Text>
-                                    <Text>{item.date}</Text>
+                                    {/* <Text>{index + 1}</Text> */}
+                                    <Text style={styles.date}>{item.date}</Text>
+                                    <Text style={styles.title}>{item.title}</Text>
                                 </View>
                                 {/* onLongPress시 삭제 */}
                                 <Text style={styles.deleteButton}>삭제</Text>
@@ -190,13 +189,14 @@ export default function App() {
 
 const styles = StyleSheet.create({
     container: {
-        width: 'calc(100vw - 40)',
+        width: '100%',
         flex: 1,
         justifyContent: 'center',
         padding: 20,
     },
     containerInner: {
         width: '100%',
+        height: 'auto',
         flexDirection: 'column',
         justifyContent: 'center',
     },
@@ -210,101 +210,136 @@ const styles = StyleSheet.create({
         left: 0,
         top: 0,
     },
+    //
     maintxt: {
-        fontSize: 28,
+        fontSize: 32,
         fontWeight: 'bold',
     },
     subtxt: {
         fontSize: 18,
+        color: 'grey',
+    },
+    gradientWrap: {
+        width: '100%',
+        height: '220',
+        borderTopLeftRadius: 10,
+        borderTopRightRadius: 10,
+        overflow: 'hidden',
+        padding: 14,
+        position: 'relative',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+    },
+    dateText: {
+        color: '#f3f3f3',
+        fontWeight: 'bold',
+        fontSize: 19,
     },
     dateWrap: {
-        width: '100%',
-        transform: 'scale(0.7)',
+        position: 'absolute',
+        transform: 'scale(0.8)',
+        zIndex: 10,
+        right: -50,
+        top: 20,
+    },
+
+    featurePhotos: {
+        gap: 4,
+        flexDirection: 'row',
+        boxShadow: '1 1 1 rega(0,0,0,0.5)',
+    },
+    btnRound: {
+        width: 32,
+        height: 32,
+        borderRadius: 40,
+        backgroundColor: '#f3f3f3',
         justifyContent: 'center',
         alignItems: 'center',
-        position: 'absolute',
-        top: -10,
-        left: 0,
-        background: '#E9DCDB',
-        background: 'linear-gradient(70deg, rgba(233, 220, 219, 1) 0%, rgba(223, 221, 221, 1) 100%)',
+        boxShadow: 'rgba(0, 0, 0, 0.1) 0px 4px 12px',
     },
-    featuresBox: {
-        flexDirection: 'column',
-        alignItems: 'flex-end',
-        gap: 4,
-        justifyContent: 'center',
-    },
-    featurePhotos: {
+    //
+    inputWrap: {
+        width: '100%',
+        height: 50,
         flexDirection: 'row',
-        gap: 10,
-        position: 'absolute',
-        left: 0,
-        top: 180,
+        backgroundColor: '#f5f5f5',
+        borderBottomLeftRadius: 10,
+        borderBottomRightRadius: 10,
+        alignItems: 'center',
+        justifyContent: 'space-around',
+        padding: 4,
+        marginBottom: 20,
+    },
+    input: {
+        width: '76%',
+        height: 40,
+        backgroundColor: 'white',
+        borderRadius: 4,
+        paddingLeft: 14,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    btnAdd: {
+        width: '19%',
+        height: 40,
+        borderRadius: 4,
+        backgroundColor: '#46a582ff',
+    },
+    textAdd: {
+        width: '100%',
+        height: 40,
+        lineHeight: 40,
+        fontSize: 20,
+        textAlign: 'center',
+        color: '#f3f3f3',
+        fontWeight: 'bold',
+        boxShadow: 'rgba(0, 0, 0, 0.1) 0px 4px 12px',
+    },
+    imagePreviewBox: {
+        width: 32,
+        height: 32,
+        borderRadius: 4,
+        overflow: 'hidden',
     },
     image: {
         width: '100%',
         height: '100%',
-        overflow: 'hidden',
         objectFit: 'cover',
-        borderRadius: '50%',
     },
-    imagePreviewBox: {
-        width: '100',
-        aspectRatio: '1/1',
-        borderRadius: 16,
-        justifyContent: 'center',
-    },
-    gradientWrap: {
-        width: '100%',
-        aspectRatio: 1 / 0.7,
-        borderRadius: 16,
-        padding: 24,
-        shadowColor: 'rgba(34, 60, 80, 0.6)',
-        shadowOffset: { width: 0, height: 5 },
-        shadowOpacity: 0.6,
-        shadowRadius: 5,
-    },
-    dateTextWrap: {
-        width: '100%',
-    },
-    dateText: {
-        fontSize: 17,
-        textAlign: 'left',
-        color: '#1f1f1f',
-        fontWeight: 'bold',
-    },
-    inputWrap: {
-        position: 'absolute',
-        right: 20,
-        bottom: 16,
-        flexDirection: 'row',
-        gap: 4,
-    },
-    input: {
-        width: 180,
-        height: 32,
-        borderWidth: 0.5,
-        paddingLeft: 10,
-        borderRadius: 4,
-    },
-    addButton: {
-        width: 46,
-        height: 32,
-        textAlign: 'center',
-        lineHeight: 32,
-        backgroundColor: 'green',
-        color: 'white',
-        borderRadius: 4,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
+    //
     contentBox: {
         width: '100%',
-        height: 'auto',
+        marginTop: 20,
     },
-    smallImage: {
-        width: 20,
-        height: 20,
+    itemBox: {
+        width: '100%',
+        height: 300,
+        backgroundColor: '#fcfcfcff',
+        borderRadius: 4,
+        padding: 20,
+        boxShadow: 'rgba(0, 0, 0, 0.1) 0px 4px 12px',
+        marginRight: 40,
+    },
+    itemPreviewImageWrap: {
+        width: 66,
+        height: 66,
         borderRadius: '100%',
+        overflow: 'hidden',
+        backgroundColor: '#e7e7e7ff',
+        alignItems: 'center',
+        justifyContent: 'center',
+        boxShadow: 'rgba(0, 0, 0, 0.1) 0px 4px 12px',
+    },
+    itemPreviewImageBox: {
+        width: 36,
+        height: 36,
+        borderRadius: 4,
+        overflow: 'hidden',
+    },
+    date: {
+        fontSize: 15,
+    },
+    title: {
+        fontSize: 20,
     },
 });
